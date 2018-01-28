@@ -1,5 +1,5 @@
 # Savant-RaspberryPi-Relay
-Savant control of a Raspberry Pi's GPIO pins via telnet.
+Savant control of a Raspberry Pi's GPIO pins. Relays attached to these GPIOs can be used to control garage doors, outlets, sprinklers or any other on/off device.
 ## Synopsis
 This Savant profile reads and writes GPIO pin states to the Raspberry Pi using WiringPi (http://wiringpi.com).
 The profile will read a pin's state whenever a write command is sent and will also poll for changes every 30 seconds. 
