@@ -1,4 +1,4 @@
-# Savant-RaspberryPi-Relay-8
+# Savant-RaspberryPi-Relay
 Savant control of 8 Raspberry Pi GPIO pins. Relays attached to these GPIOs can be used to control a variaty of on/off or momentary open/close devices.
 ## Synopsis
 The Savant profile reads and writes GPIO pin states to the Raspberry Pi using WiringPi (http://wiringpi.com).
