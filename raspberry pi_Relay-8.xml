@@ -1,0 +1,1148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="racepoint_component_profile.xsd" manufacturer="Raspberry Pi" model="wiringPi Relay-8" device_class="Contact_relay_environment_device" minimum_component_engine_version="0.0" rpm_xml_version="2.1">
+    <notes>
+        This profile requires the Raspberry Pi to have the wiringPi GPIO library installed as well as a telnet server.
+        The profile will set GPIOs 0-7 as OUTPUT and the Pi's username and password are set with user variables.
+        
+		====================== Change Log ==================
+        Version: 2.1 Change: Initial Build
+		Version: 1.4 Change: Version Number bump to support new Savant Revisioning Scheme.  Risk: Low Importance: Forced
+    </notes>
+    <control_interfaces preferred="ip">
+		<ip port="23" response_time_length_ms="3000" protocol="telnet">  
+			<send_postfix type="hex">0D0A</send_postfix>
+            <receive_end_condition test_condition="data" type="character"></receive_end_condition>
+		</ip>
+	</control_interfaces>
+    <media_interfaces>
+        <data name_on_component="NETWORK">
+            <combined_media>
+                <data_media type="ethernet"></data_media>
+                <control port="23"></control>
+            </combined_media>
+        </data>
+        <internal name_on_component="GPIO_0">
+            <environmental_media/>
+            <resource resource_type="ENV_GENERALRELAYCONTROLLEDDEVICE_SOURCE"/>
+        </internal>
+        <internal name_on_component="GPIO_1">
+            <environmental_media/>
+            <resource resource_type="ENV_GENERALRELAYCONTROLLEDDEVICE_SOURCE"/>
+        </internal>
+        <internal name_on_component="GPIO_2">
+            <environmental_media/>
+            <resource resource_type="ENV_GENERALRELAYCONTROLLEDDEVICE_SOURCE"/>
+        </internal>
+        <internal name_on_component="GPIO_3">
+            <environmental_media/>
+            <resource resource_type="ENV_GENERALRELAYCONTROLLEDDEVICE_SOURCE"/>
+        </internal>
+        <internal name_on_component="GPIO_4">
+            <environmental_media/>
+            <resource resource_type="ENV_GENERALRELAYCONTROLLEDDEVICE_SOURCE"/>
+        </internal>
+        <internal name_on_component="GPIO_5">
+            <environmental_media/>
+            <resource resource_type="ENV_GENERALRELAYCONTROLLEDDEVICE_SOURCE"/>
+        </internal>
+        <internal name_on_component="GPIO_6">
+            <environmental_media/>
+            <resource resource_type="ENV_GENERALRELAYCONTROLLEDDEVICE_SOURCE"/>
+        </internal>
+        <internal name_on_component="GPIO_7">
+            <environmental_media/>
+            <resource resource_type="ENV_GENERALRELAYCONTROLLEDDEVICE_SOURCE"/>
+        </internal>
+        <internal name_on_component="WiringPi">
+            <environmental_media/>
+            <resource resource_type="ENV_GENERALRELAYCONTROLLEDDEVICE_SOURCE"/>
+        </internal>
+    </media_interfaces>
+    <state_variable_list>
+        <state_variable name="piUsername" user_editable="yes">pi</state_variable>
+        <state_variable name="piPassword" user_editable="yes">wiringPi</state_variable>
+    </state_variable_list>
+    <logical_component logical_component_name="Relay_1">
+        <implementation>
+            <internal name_on_component="GPIO_0"/>
+        </implementation>
+        <status_messages>
+            <status_message name="GPIO 0 Status">
+				<constant type="character">gpio read 0</constant>
+                <constant type="hex">0D0A</constant>
+				<data type="character" terminator_type="hex" terminator="0D0A">
+					<data_map match_required="yes">
+						<map key="1">
+							<update state="RelayState" type="string">closed</update>
+							<update state="IsOn" type="boolean">true</update>
+                            <update state="IsOff" type="boolean">false</update>
+							<update state="RelayIsClosed" type="boolean">1</update>
+                            <update state="RelayIsOpen" type="boolean">0</update>
+                            <update state="CurrentPowerStatus" type="string">on</update>
+						</map>
+						<map key="0">
+							<update state="RelayState" type="string">open</update>
+							<update state="IsOn" type="boolean">false</update>
+                            <update state="IsOff" type="boolean">true</update>
+							<update state="RelayIsClosed" type="boolean">0</update>
+                            <update state="RelayIsOpen" type="boolean">1</update>
+                            <update state="CurrentPowerStatus" type="string">off</update>
+						</map>
+					</data_map>
+				</data>
+			</status_message>
+        </status_messages>
+        <universal_component_actions>
+            <action name="PowerOn">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 0 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerOff">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 0 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerToggle">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio toggle 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </universal_component_actions>
+        <custom_component_actions>
+            <action name="MomentaryOpen">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 0 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 0 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="MomentaryClose">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 0 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 0 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </custom_component_actions>
+    </logical_component>
+    <logical_component logical_component_name="Relay_2">
+        <implementation>
+            <internal name_on_component="GPIO_1"/>
+        </implementation>
+        <status_messages>
+            <status_message name="GPIO 1 Status">
+				<constant type="character">gpio read 1</constant>
+                <constant type="hex">0D0A</constant>
+				<data type="character" terminator_type="hex" terminator="0D0A">
+					<data_map match_required="yes">
+						<map key="1">
+							<update state="RelayState" type="string">closed</update>
+							<update state="IsOn" type="boolean">true</update>
+                            <update state="IsOff" type="boolean">false</update>
+							<update state="RelayIsClosed" type="boolean">1</update>
+                            <update state="RelayIsOpen" type="boolean">0</update>
+                            <update state="CurrentPowerStatus" type="string">on</update>
+						</map>
+						<map key="0">
+							<update state="RelayState" type="string">open</update>
+							<update state="IsOn" type="boolean">false</update>
+                            <update state="IsOff" type="boolean">true</update>
+							<update state="RelayIsClosed" type="boolean">0</update>
+                            <update state="RelayIsOpen" type="boolean">1</update>
+                            <update state="CurrentPowerStatus" type="string">off</update>
+						</map>
+					</data_map>
+				</data>
+			</status_message>
+        </status_messages>
+        <universal_component_actions>
+            <action name="PowerOn">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 1 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerOff">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 1 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerToggle">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio toggle 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </universal_component_actions>
+        <custom_component_actions>
+            <action name="MomentaryOpen">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 1 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 1 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="MomentaryClose">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 1 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 1 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </custom_component_actions>
+    </logical_component>
+    <logical_component logical_component_name="Relay_3">
+        <implementation>
+            <internal name_on_component="GPIO_2"/>
+        </implementation>
+        <status_messages>
+            <status_message name="GPIO 2 Status">
+				<constant type="character">gpio read 2</constant>
+                <constant type="hex">0D0A</constant>
+				<data type="character" terminator_type="hex" terminator="0D0A">
+					<data_map match_required="yes">
+						<map key="1">
+							<update state="RelayState" type="string">closed</update>
+							<update state="IsOn" type="boolean">true</update>
+                            <update state="IsOff" type="boolean">false</update>
+							<update state="RelayIsClosed" type="boolean">1</update>
+                            <update state="RelayIsOpen" type="boolean">0</update>
+                            <update state="CurrentPowerStatus" type="string">on</update>
+						</map>
+						<map key="0">
+							<update state="RelayState" type="string">open</update>
+							<update state="IsOn" type="boolean">false</update>
+                            <update state="IsOff" type="boolean">true</update>
+							<update state="RelayIsClosed" type="boolean">0</update>
+                            <update state="RelayIsOpen" type="boolean">1</update>
+                            <update state="CurrentPowerStatus" type="string">off</update>
+						</map>
+					</data_map>
+				</data>
+			</status_message>
+        </status_messages>
+        <universal_component_actions>
+            <action name="PowerOn">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 2 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 2</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerOff">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 2 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 2</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerToggle">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio toggle 2</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 2</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </universal_component_actions>
+        <custom_component_actions>
+            <action name="MomentaryOpen">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 2 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 2</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 2 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 2</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="MomentaryClose">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 2 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 2</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 2 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 2</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </custom_component_actions>
+    </logical_component>
+    <logical_component logical_component_name="Relay_4">
+        <implementation>
+            <internal name_on_component="GPIO_3"/>
+        </implementation>
+        <status_messages>
+            <status_message name="GPIO 3 Status">
+				<constant type="character">gpio read 3</constant>
+                <constant type="hex">0D0A</constant>
+				<data type="character" terminator_type="hex" terminator="0D0A">
+					<data_map match_required="yes">
+						<map key="1">
+							<update state="RelayState" type="string">closed</update>
+							<update state="IsOn" type="boolean">true</update>
+                            <update state="IsOff" type="boolean">false</update>
+							<update state="RelayIsClosed" type="boolean">1</update>
+                            <update state="RelayIsOpen" type="boolean">0</update>
+                            <update state="CurrentPowerStatus" type="string">on</update>
+						</map>
+						<map key="0">
+							<update state="RelayState" type="string">open</update>
+							<update state="IsOn" type="boolean">false</update>
+                            <update state="IsOff" type="boolean">true</update>
+							<update state="RelayIsClosed" type="boolean">0</update>
+                            <update state="RelayIsOpen" type="boolean">1</update>
+                            <update state="CurrentPowerStatus" type="string">off</update>
+						</map>
+					</data_map>
+				</data>
+			</status_message>
+        </status_messages>
+        <universal_component_actions>
+            <action name="PowerOn">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 3 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 3</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerOff">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 3 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 3</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerToggle">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio toggle 3</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 3</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </universal_component_actions>
+        <custom_component_actions>
+            <action name="MomentaryOpen">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 3 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 3</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 3 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 3</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="MomentaryClose">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 3 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 3</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 3 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 3</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </custom_component_actions>
+    </logical_component>
+    <logical_component logical_component_name="Relay_5">
+        <implementation>
+            <internal name_on_component="GPIO_4"/>
+        </implementation>
+        <status_messages>
+            <status_message name="GPIO 4 Status">
+				<constant type="character">gpio read 4</constant>
+                <constant type="hex">0D0A</constant>
+				<data type="character" terminator_type="hex" terminator="0D0A">
+					<data_map match_required="yes">
+						<map key="1">
+							<update state="RelayState" type="string">closed</update>
+							<update state="IsOn" type="boolean">true</update>
+                            <update state="IsOff" type="boolean">false</update>
+							<update state="RelayIsClosed" type="boolean">1</update>
+                            <update state="RelayIsOpen" type="boolean">0</update>
+                            <update state="CurrentPowerStatus" type="string">on</update>
+						</map>
+						<map key="0">
+							<update state="RelayState" type="string">open</update>
+							<update state="IsOn" type="boolean">false</update>
+                            <update state="IsOff" type="boolean">true</update>
+							<update state="RelayIsClosed" type="boolean">0</update>
+                            <update state="RelayIsOpen" type="boolean">1</update>
+                            <update state="CurrentPowerStatus" type="string">off</update>
+						</map>
+					</data_map>
+				</data>
+			</status_message>
+        </status_messages>
+        <universal_component_actions>
+            <action name="PowerOn">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 4 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 4</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerOff">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 4 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 4</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerToggle">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio toggle 4</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 4</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </universal_component_actions>
+        <custom_component_actions>
+            <action name="MomentaryOpen">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 4 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 4</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 4 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 4</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="MomentaryClose">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 4 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 4</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 4 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 4</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </custom_component_actions>
+    </logical_component>
+    <logical_component logical_component_name="Relay_6">
+        <implementation>
+            <internal name_on_component="GPIO_5"/>
+        </implementation>
+        <status_messages>
+            <status_message name="GPIO 5 Status">
+				<constant type="character">gpio read 5</constant>
+                <constant type="hex">0D0A</constant>
+				<data type="character" terminator_type="hex" terminator="0D0A">
+					<data_map match_required="yes">
+						<map key="1">
+							<update state="RelayState" type="string">closed</update>
+							<update state="IsOn" type="boolean">true</update>
+                            <update state="IsOff" type="boolean">false</update>
+							<update state="RelayIsClosed" type="boolean">1</update>
+                            <update state="RelayIsOpen" type="boolean">0</update>
+                            <update state="CurrentPowerStatus" type="string">on</update>
+						</map>
+						<map key="0">
+							<update state="RelayState" type="string">open</update>
+							<update state="IsOn" type="boolean">false</update>
+                            <update state="IsOff" type="boolean">true</update>
+							<update state="RelayIsClosed" type="boolean">0</update>
+                            <update state="RelayIsOpen" type="boolean">1</update>
+                            <update state="CurrentPowerStatus" type="string">off</update>
+						</map>
+					</data_map>
+				</data>
+			</status_message>
+        </status_messages>
+        <universal_component_actions>
+            <action name="PowerOn">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 5 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 5</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerOff">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 5 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 5</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerToggle">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio toggle 5</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 5</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </universal_component_actions>
+        <custom_component_actions>
+            <action name="MomentaryOpen">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 5 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 5</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 5 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 5</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="MomentaryClose">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 5 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 5</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 5 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 5</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </custom_component_actions>
+    </logical_component>
+    <logical_component logical_component_name="Relay_7">
+        <implementation>
+            <internal name_on_component="GPIO_6"/>
+        </implementation>
+        <status_messages>
+            <status_message name="GPIO 6 Status">
+				<constant type="character">gpio read 6</constant>
+                <constant type="hex">0D0A</constant>
+				<data type="character" terminator_type="hex" terminator="0D0A">
+					<data_map match_required="yes">
+						<map key="1">
+							<update state="RelayState" type="string">closed</update>
+							<update state="IsOn" type="boolean">true</update>
+                            <update state="IsOff" type="boolean">false</update>
+							<update state="RelayIsClosed" type="boolean">1</update>
+                            <update state="RelayIsOpen" type="boolean">0</update>
+                            <update state="CurrentPowerStatus" type="string">on</update>
+						</map>
+						<map key="0">
+							<update state="RelayState" type="string">open</update>
+							<update state="IsOn" type="boolean">false</update>
+                            <update state="IsOff" type="boolean">true</update>
+							<update state="RelayIsClosed" type="boolean">0</update>
+                            <update state="RelayIsOpen" type="boolean">1</update>
+                            <update state="CurrentPowerStatus" type="string">off</update>
+						</map>
+					</data_map>
+				</data>
+			</status_message>
+        </status_messages>
+        <universal_component_actions>
+            <action name="PowerOn">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 6 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 6</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerOff">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 6 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 6</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerToggle">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio toggle 6</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 6</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </universal_component_actions>
+        <custom_component_actions>
+            <action name="MomentaryOpen">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 6 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 6</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 6 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 6</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="MomentaryClose">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 6 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 6</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 6 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 6</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </custom_component_actions>
+    </logical_component>
+    <logical_component logical_component_name="Relay_8">
+        <implementation>
+            <internal name_on_component="GPIO_7"/>
+        </implementation>
+        <status_messages>
+            <status_message name="GPIO 7 Status">
+				<constant type="character">gpio read 7</constant>
+                <constant type="hex">0D0A</constant>
+				<data type="character" terminator_type="hex" terminator="0D0A">
+					<data_map match_required="yes">
+						<map key="1">
+							<update state="RelayState" type="string">closed</update>
+							<update state="IsOn" type="boolean">true</update>
+                            <update state="IsOff" type="boolean">false</update>
+							<update state="RelayIsClosed" type="boolean">1</update>
+                            <update state="RelayIsOpen" type="boolean">0</update>
+                            <update state="CurrentPowerStatus" type="string">on</update>
+						</map>
+						<map key="0">
+							<update state="RelayState" type="string">open</update>
+							<update state="IsOn" type="boolean">false</update>
+                            <update state="IsOff" type="boolean">true</update>
+							<update state="RelayIsClosed" type="boolean">0</update>
+                            <update state="RelayIsOpen" type="boolean">1</update>
+                            <update state="CurrentPowerStatus" type="string">off</update>
+						</map>
+					</data_map>
+				</data>
+			</status_message>
+        </status_messages>
+        <universal_component_actions>
+            <action name="PowerOn">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 7 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 7</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerOff">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 7 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 7</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="PowerToggle">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio toggle 7</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 7</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </universal_component_actions>
+        <custom_component_actions>
+            <action name="MomentaryOpen">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 7 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 7</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 7 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 7</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="MomentaryClose">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio write 7 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 7</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio write 7 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 7</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </custom_component_actions>
+    </logical_component>
+    <logical_component logical_component_name="Global">
+        <implementation>
+            <internal name_on_component="WiringPi"/>
+        </implementation>
+        <status_messages>
+            <status_message name="Login">
+                <constant type="character">login:</constant>
+                <run_elements>  
+                    <actions>
+                        <action name="Initialize">
+                            <command_interface interface="ip">
+                                <command response_required="no"><!-- User -->
+                                    <parameter_list>
+                                        <parameter parameter_data_type="character" state_variable="piUsername"></parameter>
+                                    </parameter_list>
+                                    <delay ms_delay="200"/>
+                                </command>
+                                <command response_required="no"><!-- Password -->
+                                    <parameter_list>
+                                        <parameter parameter_data_type="character" state_variable="piPassword"></parameter>
+                                    </parameter_list>
+                                    <delay ms_delay="500"/>
+                                </command>
+                                <command response_required="no"><!-- Pin 0 Out -->
+                                    <command_string type="character">gpio mode 0 out</command_string>
+                                    <delay ms_delay="200"/>
+                                </command>
+                                <command response_required="no"><!-- Pin 1 Out -->
+                                    <command_string type="character">gpio mode 1 out</command_string>
+                                    <delay ms_delay="200"/>
+                                </command>
+                                <command response_required="no"><!-- Pin 2 Out -->
+                                    <command_string type="character">gpio mode 2 out</command_string>
+                                    <delay ms_delay="200"/>
+                                </command>
+                                <command response_required="no"><!-- Pin 3 Out -->
+                                    <command_string type="character">gpio mode 3 out</command_string>
+                                    <delay ms_delay="200"/>
+                                </command>
+                                <command response_required="no"><!-- Pin 4 Out -->
+                                    <command_string type="character">gpio mode 4 out</command_string>
+                                    <delay ms_delay="200"/>
+                                </command>
+                                <command response_required="no"><!-- Pin 5 Out -->
+                                    <command_string type="character">gpio mode 5 out</command_string>
+                                    <delay ms_delay="200"/>
+                                </command>
+                                <command response_required="no"><!-- Pin 6 Out -->
+                                    <command_string type="character">gpio mode 6 out</command_string>
+                                    <delay ms_delay="200"/>
+                                </command>
+                                <command response_required="no"><!-- Pin 7 Out -->
+                                    <command_string type="character">gpio mode 7 out</command_string>
+                                    <delay ms_delay="200"/>
+                                </command>
+                                <command response_required="no"><!-- Get Pi Info -->
+                                    <command_string type="character">gpio -v</command_string>
+                                    <delay ms_delay="200"/>
+                                </command>
+                            </command_interface>
+                        </action>
+                    </actions>
+                </run_elements>
+            </status_message>
+            <status_message name="GPIOVersion">
+                <constant type="character">gpio version: </constant>
+                <data type="character" terminator_type="end_of_data">
+                    <update state="GPIOVersion" type="string"/>
+                </data>
+            </status_message>
+            <status_message name="PiType">
+                <constant type="character">Type: </constant>
+                <data type="character" terminator_type="character" terminator=",">
+                    <update state="PiType" type="string"/>
+                </data>
+            </status_message>
+            <status_message name="PiRevision">
+                <constant type="character">Revision: </constant>
+                <data type="character" terminator_type="character" terminator=",">
+                    <update state="PiRevision" type="string"/>
+                </data>
+            </status_message>
+            <status_message name="PiMemory">
+                <constant type="character">Memory: </constant>
+                <data type="character" terminator_type="character" terminator=",">
+                    <update state="PiMemory" type="string"/>
+                </data>
+            </status_message>
+            <status_message name="PiMaker">
+                <constant type="character">Maker: </constant>
+                <data type="character" terminator_type="character" terminator=" ">
+                    <update state="PiMaker" type="string"/>
+                </data>
+            </status_message>     
+        </status_messages>
+        <custom_component_actions>
+            <action name="ReadAllStatus">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio readall</command_string>
+                        <delay ms_delay="1000"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="AllReadAllStatus">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio allreadall</command_string>
+                        <delay ms_delay="1000"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="GetIndividualStatus">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio read 0</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 1</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 2</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 3</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 4</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 5</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 6</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio read 7</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+                <execute_on_schedule period_ms="30000"/>
+            </action>
+            <action name="GetPiInfo">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio -v</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+            <action name="SetAllAsOutput">
+                <command_interface interface="ip">
+                    <command response_required="no">
+                        <command_string type="character">gpio mode 0 out</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio mode 1 out</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio mode 2 out</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio mode 3 out</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio mode 4 out</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio mode 5 out</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio mode 6 out</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                    <command response_required="no">
+                        <command_string type="character">gpio mode 7 out</command_string>
+                        <delay ms_delay="200"/>
+                    </command>
+                </command_interface>
+            </action>
+        </custom_component_actions>
+    </logical_component>
+</component>
