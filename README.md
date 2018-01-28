@@ -6,7 +6,7 @@ The profile will read a pin's state whenever a write command is sent and will al
 After login the profile sets the pins to output thus is not valid for contact sensing input applications. 
 For sensing of input pin state changes use another Raspberry Pi and the Pi Sensor profile.
 Communication is made with a telnet session and login credentials are defined with user variables on the device in Blueprint.
-## Installation
+## Preparation
 STEP 1: Install wiringPi on the Raspberry Pi that you are controlling.
 Reference http://wiringpi.com/download-and-install/ for full instructions and usage.
 ```
